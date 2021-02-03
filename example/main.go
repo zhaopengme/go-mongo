@@ -1,17 +1,23 @@
-package example
+package main
 
 import (
 	"fmt"
-	mongo "github.com/igufei/go-mongo"
+	mongo "github.com/zhaopengme/go-mongo"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 func init() {
-	mongo.MustConnect("mongodb://localhost:27017", "usermanager")
+	options := mongo.MgoOptions{
+		DbHost:   "mongodb://47.252.86.134:27017",
+		DbName:   "hotflow",
+		Username: "pro",
+		Password: "C*fNQNBeY9KAHUp7afYw",
+	}
+	mongo.MustConnect(options)
 }
 
 func main() {
-	value := mongo.Instance.FindOne("agent", bson.M{
+	value := mongo.Instance.InsertOne("agent", bson.M{
 		"username": "gufeng",
 	})
 	fmt.Printf("%v", value)

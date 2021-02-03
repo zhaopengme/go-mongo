@@ -6,7 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"sync"
 	"time"
 )
@@ -55,10 +54,10 @@ func (db *mongodb) _connect(mgoOptions MgoOptions) error {
 	if err != nil {
 		return err
 	}
-	err = client.Ping(ctx, readpref.Primary())
-	if err != nil {
-		return err
-	}
+	//err = client.Ping(ctx, readpref.Primary())
+	//if err != nil {
+	//	return err
+	//}
 	db.database = client.Database(mgoOptions.DbName)
 	return nil
 }
