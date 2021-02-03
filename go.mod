@@ -1,4 +1,4 @@
-module github.com/igufei/go-mongo
+module github.com/zhaopengme/go-mongo
 
 go 1.14
 

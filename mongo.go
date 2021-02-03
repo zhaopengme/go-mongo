@@ -14,6 +14,13 @@ import (
 var mdb *mongodb
 var once sync.Once
 
+type MgoOptions struct {
+	DbHost   string
+	DbName   string
+	Username string
+	Password string
+}
+
 type mongodb struct {
 	database *mongo.Database
 }
@@ -22,10 +29,10 @@ type mongodb struct {
 var Instance *mongodb
 
 // MustConnect 连接数据库，并创建单例
-func MustConnect(dbHOST string, dbName string) {
+func MustConnect(mgoOptions MgoOptions) {
 	once.Do(func() {
 		mdb = &mongodb{}
-		if err := mdb._connect(dbHOST, dbName); err != nil {
+		if err := mdb._connect(mgoOptions); err != nil {
 			panic("数据库连接失败")
 		}
 		Instance = mdb
@@ -33,11 +40,18 @@ func MustConnect(dbHOST string, dbName string) {
 }
 
 // 链接数据库
-func (db *mongodb) _connect(dbHOST string, dbName string) error {
+func (db *mongodb) _connect(mgoOptions MgoOptions) error {
 	// opts := &options.ClientOptions{}
 	// opts.SetMaxPoolSize(5) //设置连接池大小
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbHOST))
+	clientOptions := options.Client().ApplyURI(mgoOptions.DbHost)
+	if len(mgoOptions.Username) > 0 {
+		clientOptions.SetAuth(options.Credential{
+			Username: mgoOptions.Username,
+			Password: mgoOptions.Password,
+		})
+	}
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		return err
 	}
@@ -45,7 +59,7 @@ func (db *mongodb) _connect(dbHOST string, dbName string) error {
 	if err != nil {
 		return err
 	}
-	db.database = client.Database(dbName)
+	db.database = client.Database(mgoOptions.DbName)
 	return nil
 }
 
